@@ -11,6 +11,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag sncf-on-time:$GITHUB_SHA
 
@@ -32,7 +39,7 @@ jobs:
 
     - name: Deploy Cloud Run Job
       run: |
-        gcloud beta run jobs create christophe-sncf-on-time \
+        gcloud beta --quiet run jobs create christophe-sncf-on-time \
           --image europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA \
           --args --token ${{ secrets.TOKEN }} --date 2023-01-05 --ville Rennes \
           --update-env-vars SERVICE_ACCOUNT_INFO=${{ secrets.GOOGLE_CREDENTIALS }}
