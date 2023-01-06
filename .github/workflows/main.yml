@@ -10,9 +10,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag sncf-on-time:$GITHUB_SHA
+
     - name: Tag the Docker image
       run: docker tag sncf-on-time:$GITHUB_SHA europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA
+
+    - name: Auth on GCP
+      uses: docker/login-action@v2
+        with:
+          registry: europe-docker-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GOOGLE_CREDENTIALS }}
+
     - name: Push the Docker tagged image
       run: docker push europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA
