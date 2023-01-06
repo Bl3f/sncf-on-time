@@ -54,4 +54,4 @@ jobs:
           --region europe-west1 \
           --image europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA \
           --args ${{ secrets.TOKEN }},2023-01-05,Rennes \
-          --set-env-vars SERVICE_ACCOUNT_INFO=${{ secrets.GOOGLE_CREDENTIALS }}
+          --set-env-vars SERVICE_ACCOUNT_INFO=$(echo '${{ secrets.GOOGLE_CREDENTIALS }}' | base64)

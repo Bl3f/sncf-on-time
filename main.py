@@ -5,6 +5,7 @@ import requests
 from datetime import timedelta
 import pandas as pd
 from google.oauth2 import service_account
+import base64
 
 STOPS = {
     "Rennes": "87471003",
@@ -36,7 +37,7 @@ def run(token, date, ville):
 
     trains.to_csv(f"{date.strftime('%Y-%m-%d')}_{ville}.csv", index=False)
 
-    service_account_info = os.getenv("SERVICE_ACCOUNT_INFO")
+    service_account_info = base64.b64decode(os.getenv("SERVICE_ACCOUNT_INFO"))
     credentials = service_account.Credentials.from_service_account_info(
         json.loads(service_account_info)
     )
