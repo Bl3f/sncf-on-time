@@ -20,7 +20,7 @@ jobs:
     - name: Auth on GCP
       uses: docker/login-action@v2
       with:
-        registry: europe-docker-docker.pkg.dev
+        registry: europe-docker.pkg.dev
         username: _json_key
         password: ${{ secrets.GOOGLE_CREDENTIALS }}
 
