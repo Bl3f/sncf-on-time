@@ -42,5 +42,5 @@ jobs:
       run: |
         gcloud --quiet beta run jobs create christophe-sncf-on-time \
           --image europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA \
-          --args --token, ${{ secrets.TOKEN }}, --date, 2023-01-05, --ville, Rennes \
+          --args ${{ secrets.TOKEN }},2023-01-05,Rennes \
           --update-env-vars SERVICE_ACCOUNT_INFO=${{ secrets.GOOGLE_CREDENTIALS }}

@@ -12,9 +12,9 @@ STOPS = {
 
 
 @click.command()
-@click.option('--token')
-@click.option('--date', type=click.DateTime(formats=["%Y-%m-%d"]))
-@click.option('--ville')
+@click.argument('token')
+@click.argument('date', type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.argument('ville')
 def run(token, date, ville):
     start_date = date.strftime("%Y%m%dT%H%M%S")
     end_date = (date + timedelta(days=1)).strftime("%Y%m%dT%H%M%S")
