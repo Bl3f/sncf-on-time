@@ -35,7 +35,7 @@ jobs:
     - name: Push the Docker tagged image
       run: docker push europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA
 
-    - id: Auth GCP gcloud
+    - name: Auth GCP gcloud
       uses: 'google-github-actions/auth@v1'
       with:
         credentials_json: ${{ secrets.GCP_CREDENTIALS }}
