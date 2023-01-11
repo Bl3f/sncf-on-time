@@ -43,9 +43,9 @@ jobs:
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
 
-    #- name: Delete Cloud Run Job
-    #    run: |
-    #      gcloud --quiet beta run jobs delete christophe-sncf-on-time
+    - name: Delete Cloud Run Job
+        run: |
+          gcloud --quiet beta run jobs delete christophe-sncf-on-time
 
     - name: Deploy Cloud Run Job
       run: |
@@ -53,5 +53,5 @@ jobs:
           --project ensai-2023-373710 \
           --region europe-west1 \
           --image europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA \
-          --args ${{ secrets.TOKEN }},2023-01-05,Rennes \
+          --args ${{ secrets.TOKEN }} \
           --set-env-vars SERVICE_ACCOUNT_INFO='${{ secrets.GOOGLE_CREDENTIALS }}'

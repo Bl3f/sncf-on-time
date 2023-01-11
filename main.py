@@ -2,7 +2,7 @@ import json
 import os
 import click
 import requests
-from datetime import timedelta
+from datetime import timedelta, date
 import pandas as pd
 from google.oauth2 import service_account
 import base64
@@ -35,44 +35,58 @@ def get_data(token, start_date, end_date, ville):
 
     response = requests.get(url, headers={"Authorization": token})
     data = response.json()
-    df = pd.DataFrame(data["arrivals"])
+    arrivals = pd.DataFrame(data["arrivals"])
+    disruptions = pd.DataFrame(data["disruptions"])
 
-    return df
+    return arrivals, disruptions
+
+
+def get_and_prepare_data(token, start_date, end_date, ville):
+    disruptions_json_columns = ["severity", "application_periods", "messages", "impacted_objects"]
+
+    arrivals, disruptions = get_data(token, start_date, end_date, ville)
+    arrivals = arrivals.applymap(json.dumps)
+    disruptions[disruptions_json_columns] = disruptions[disruptions_json_columns].applymap(json.dumps)
+    arrivals['gare_label'] = ville
+    arrivals['run_date'] = start_date
+
+    return arrivals, disruptions
 
 
 @click.command()
 @click.argument('token')
-@click.argument('date', type=click.DateTime(formats=["%Y-%m-%d"]))
-@click.argument('ville')
-def run(token, date, ville):
-    start_date = date.strftime("%Y%m%dT%H%M%S")
-    end_date = (date + timedelta(days=1)).strftime("%Y%m%dT%H%M%S")
+@click.option('--ville', default='all')
+@click.option('--input-date', type=click.DateTime(formats=["%Y-%m-%d"]), default=str(date.today() - timedelta(days=1)))
+def run(token, ville, input_date):
+    start_date = input_date.strftime("%Y%m%dT%H%M%S")
+    end_date = (input_date + timedelta(days=1)).strftime("%Y%m%dT%H%M%S")
 
-    output = []
-    if ville == 'all':
-        for label, id in STOPS.items():
-            print(f"Requesting {label}")
-            df = get_data(token, start_date, end_date, id)
-            df = df.applymap(json.dumps, axis=1)
-            df['gare_label'] = label
-            df['run_date'] = start_date
-            output.append(df)
-            time.sleep(1)
-    else:
-        df = get_data(token, start_date, end_date, ville)
-        df = df.applymap(json.dumps)
-        df['gare_label'] = ville
-        df['run_date'] = start_date
-        output.append(df)
+    arrivals_output = []
+    disruptions_output = []
+    for label in (STOPS if ville == 'all' else [ville]):
+        print(f"Requesting {label}")
+        arrivals, disruptions = get_and_prepare_data(token, start_date, end_date, label)
+        arrivals_output.append(arrivals)
+        disruptions_output.append(disruptions)
+        time.sleep(1)
 
     service_account_info = base64.b64decode(os.getenv("SERVICE_ACCOUNT_INFO"))
     credentials = service_account.Credentials.from_service_account_info(
         json.loads(service_account_info)
     )
 
-    trains = pd.concat(output)
-    trains.to_gbq(
-        'christophe.trains',
+    arrivals = pd.concat(arrivals_output)
+    arrivals.to_gbq(
+        'christophe.arrivals',
+        project_id='ensai-2023-373710',
+        location='eu',
+        credentials=credentials,
+        if_exists='append',
+    )
+
+    disruptions = pd.concat(disruptions_output)
+    disruptions.to_gbq(
+        'christophe.disruptions',
         project_id='ensai-2023-373710',
         location='eu',
         credentials=credentials,
