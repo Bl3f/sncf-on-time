@@ -45,7 +45,9 @@ jobs:
 
     - name: Delete Cloud Run Job
       run: |
-        gcloud --quiet beta run jobs delete christophe-sncf-on-time
+        gcloud --quiet beta run jobs delete christophe-sncf-on-time \
+          --project ensai-2023-373710 \
+          --region europe-west1 \
 
     - name: Deploy Cloud Run Job
       run: |
