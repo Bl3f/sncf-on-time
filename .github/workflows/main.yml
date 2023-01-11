@@ -30,7 +30,7 @@ jobs:
       with:
         registry: europe-docker.pkg.dev
         username: _json_key
-        password: ${{ secrets.GOOGLE_CREDENTIALS }}
+        password: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
 
     - name: Push the Docker tagged image
       run: docker push europe-docker.pkg.dev/ensai-2023-373710/christophe/sncf-on-time:$GITHUB_SHA
@@ -38,7 +38,7 @@ jobs:
     - name: Auth GCP gcloud
       uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
