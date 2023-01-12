@@ -46,7 +46,8 @@ def get_and_prepare_data(token, start_date, end_date, ville):
 
     arrivals, disruptions = get_data(token, start_date, end_date, ville)
     arrivals = arrivals.applymap(json.dumps)
-    disruptions[disruptions_json_columns] = disruptions[disruptions_json_columns].applymap(json.dumps)
+    if not disruptions.empty:
+        disruptions[disruptions_json_columns] = disruptions[disruptions_json_columns].applymap(json.dumps)
     arrivals['gare_label'] = ville
     arrivals['run_date'] = start_date
 
@@ -77,7 +78,7 @@ def run(token, ville, input_date):
 
     arrivals = pd.concat(arrivals_output)
     arrivals.to_gbq(
-        'christophe.arrivals',
+        'raw.arrivals',
         project_id='ensai-2023-373710',
         location='eu',
         credentials=credentials,
@@ -86,7 +87,7 @@ def run(token, ville, input_date):
 
     disruptions = pd.concat(disruptions_output)
     disruptions.to_gbq(
-        'christophe.disruptions',
+        'raw.disruptions',
         project_id='ensai-2023-373710',
         location='eu',
         credentials=credentials,
