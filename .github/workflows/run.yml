@@ -1,0 +1,28 @@
+name: Run
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+
+jobs:
+  prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag sncf-on-time:$GITHUB_SHA
+
+      - name: Run the script
+        run: docker run sncf-on-time:$GITHUB_SHA ${{ secrets.TOKEN }}
+        env:
+          SERVICE_ACCOUNT_INFO: ${{ secrets.GOOGLE_CREDENTIALS }}
