@@ -24,6 +24,6 @@ jobs:
         run: docker build . --file Dockerfile --tag sncf-on-time:$GITHUB_SHA
 
       - name: Run the script
-        run: docker run sncf-on-time:$GITHUB_SHA ${{ secrets.TOKEN }}
+        run: docker run -e SERVICE_ACCOUNT_INFO=$SERVICE_ACCOUNT_INFO sncf-on-time:$GITHUB_SHA ${{ secrets.TOKEN }}
         env:
           SERVICE_ACCOUNT_INFO: ${{ secrets.GOOGLE_CREDENTIALS }}
