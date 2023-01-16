@@ -46,8 +46,9 @@ def get_and_prepare_data(token, start_date, end_date, ville):
 
     arrivals, disruptions = get_data(token, start_date, end_date, ville)
     arrivals = arrivals.applymap(json.dumps)
-    if not disruptions.empty:
-        disruptions[disruptions_json_columns] = disruptions[disruptions_json_columns].applymap(json.dumps)
+    for json_col in disruptions_json_columns:
+        if json_col in disruptions.columns:
+            disruptions[json_col] = disruptions[json_col].apply(json.dumps)
     arrivals['gare_label'] = ville
     arrivals['run_date'] = start_date
 
