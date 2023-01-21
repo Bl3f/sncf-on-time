@@ -35,8 +35,12 @@ def get_data(token, start_date, end_date, ville):
 
     response = requests.get(url, headers={"Authorization": token})
     data = response.json()
-    arrivals = pd.DataFrame(data["arrivals"])
-    disruptions = pd.DataFrame(data["disruptions"])
+    try:
+        arrivals = pd.DataFrame(data["arrivals"])
+        disruptions = pd.DataFrame(data["disruptions"])
+    except KeyError as er:
+        print(er)
+        return pd.DataFrame([]), pd.DataFrame([])
 
     return arrivals, disruptions
 
